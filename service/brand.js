@@ -1,7 +1,7 @@
 const passport = require("passport");
 module.exports = (app, db) => {
-  app.get("/products", async (req, res) => {
-    await db.product
+  app.get("/brands", async (req, res) => {
+    await db.brand
       .findAll()
       .then(result => {
         res.status(200).json(result);
@@ -13,22 +13,16 @@ module.exports = (app, db) => {
       });
   });
   app.post(
-    "/add-product",
+    "/add-brand",
     passport.authenticate("jwt", {
       session: false
     }),
     async (req, res) => {
       if (req.user.role === "admin") {
-        await db.product
+        await db.brand
           .create({
             name: req.body.name,
-            price: req.body.price,
-            amount: req.body.amount,
-            description: req.body.description,
-            image1: req.body.image1,
-            image2: req.body.image2,
-            image3: req.body.image3,
-            brand_id:req.body.brand_id,
+            image: req.body.image
           })
           .then(result => {
             res.status(201).json(result);
@@ -47,31 +41,25 @@ module.exports = (app, db) => {
     }
   );
   app.put(
-    "/update-product/:id",
+    "/update-brand/:id",
     passport.authenticate("jwt", {
       session: false
     }),
     async (req, res) => {
       if (req.user.role === "admin") {
-        let targetProduct = await db.product.findOne({
+        let targetBrand = await db.brand.findOne({
           where: {
             id: req.params.id
           }
         });
-        if (!targetProduct) {
+        if (!targetBrand) {
           res.status(400).send({
-            message: "product is not found"
+            message: "brand is not found"
           });
         } else {
-          targetProduct.update({
+          targetBrand.update({
             name: req.body.name,
-            price: req.body.price,
-            amount: req.body.amount,
-            description: req.body.description,
-            image1: req.body.image1,
-            image2: req.body.image2,
-            image3: req.body.image3,
-            brand_id:req.body.brand_id,
+            image: req.body.image
           });
           res.status(200).json({
             message: "success"
@@ -85,23 +73,23 @@ module.exports = (app, db) => {
     }
   );
   app.delete(
-    "/delete-product/:id",
+    "/delete-brand/:id",
     passport.authenticate("jwt", {
       session: false
     }),
     async function(req, res) {
       if (req.user.role === "admin") {
-        let targetProduct = await db.product.findOne({
+        let targetBrand = await db.brand.findOne({
           where: {
             id: req.params.id
           }
         });
-        if (!targetProduct) {
+        if (!targetBrand) {
           res.status(400).send({
-            message: "product is not found"
+            message: "brand is not found"
           });
         } else {
-          targetProduct.destroy();
+          targetBrand.destroy();
           res.status(200).json({
             message: "success"
           });

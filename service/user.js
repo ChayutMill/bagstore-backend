@@ -73,4 +73,25 @@ module.exports = (app, db) => {
         })(req, res, next);
       }
     );
+    app.put('/change-password', passport.authenticate('jwt', { session: false }),
+    async function (req, res) {
+      let targetUser = await db.user.findOne({ where: { id: req.user.id } })
+      if (!targetUser) {
+        res.status(404).send({ message: "user not found" })
+      } else {
+        var salt = bcrypt.genSaltSync(config.BCRYPT_SALT_ROUNDS);
+        var newHashedPassword = bcrypt.hashSync(req.body.newPassword, salt);
+        bcrypt.compare(req.body.oldPassword, req.user.password, function (err, response) {
+          console.log({ response })
+          if (!response) {
+            res.status(401).send({ message: 'your old password is wrong.' })
+          } else {
+            targetUser.update({
+              password: newHashedPassword
+            })
+            res.status(200).send({ message: "Your password is changed." })
+          }
+        });
+      }
+    })
 }
