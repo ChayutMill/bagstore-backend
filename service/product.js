@@ -1,5 +1,17 @@
 const passport = require("passport");
 module.exports = (app, db) => {
+  app.get("/get-product-detail", (req, res) => {
+    db.product
+      .findOne({
+        where: {
+          id: req.query.productId
+        }
+      })
+      .then(result => {
+        res.send(result);
+      });
+  });
+
   app.get("/products", async (req, res) => {
     await db.product
       .findAll()
@@ -28,7 +40,7 @@ module.exports = (app, db) => {
             image1: req.body.image1,
             image2: req.body.image2,
             image3: req.body.image3,
-            brand_id:req.body.brand_id,
+            brand_id: req.body.brand_id
           })
           .then(result => {
             res.status(201).json(result);
@@ -71,7 +83,7 @@ module.exports = (app, db) => {
             image1: req.body.image1,
             image2: req.body.image2,
             image3: req.body.image3,
-            brand_id:req.body.brand_id,
+            brand_id: req.body.brand_id
           });
           res.status(200).json({
             message: "success"
